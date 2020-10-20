@@ -1,0 +1,20 @@
+# Erisa's Coudflared Docker Image
+
+This repository contains a simple Dockerfile to build `cloudflared`, the client for Cloudflare's [Argo Tunnel](https://developers.cloudflare.com/argo-tunnel/), from [source](https://github.com/cloudflare/cloudflared).
+
+The aim is to support multiple architectures. The public image currently only supports `linux/arm64` however this will change soon. 
+
+The public image corresponding to this Dockerfile is `erisamoe/cloudflared` and should work in mostly the same way as the [official image](https://hub.docker.com/r/cloudflare/cloudflared)
+
+A basic `docker-compose` example for exposing an internal service would be:
+```yml
+    cloudflared:
+        image: erisamoe/cloudflared
+        container_name: cloudflared
+        volumes:
+            - ./cloudflared:/etc/cloudflared
+        command: --hostname mycontainer.example.com --url http://mycontainer:8080
+        depends_on:
+            - mycontainer
+```
+With `./cloudflared` being a directory containing the certifcate for Argo Tunnel. For more details on `cloudflared` usage, check out the [official docs](https://developers.cloudflare.com/argo-tunnel/)

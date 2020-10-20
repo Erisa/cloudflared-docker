@@ -2,7 +2,7 @@
 
 This repository contains a simple Dockerfile to build `cloudflared`, the client for Cloudflare's [Argo Tunnel](https://developers.cloudflare.com/argo-tunnel/), from [source](https://github.com/cloudflare/cloudflared).
 
-The aim is to support multiple architectures. The public image currently only supports `linux/arm64` however this will change soon. 
+The aim is to support multiple architectures. The public image *currently* supports `linux/amd64` and `linux/arm64`. 
 
 The public image corresponding to this Dockerfile is `erisamoe/cloudflared` and should work in mostly the same way as the [official image](https://hub.docker.com/r/cloudflare/cloudflared)
 

@@ -9,20 +9,33 @@ The public image currently supports:
 | `linux/amd64`  | `x86_64`      | Majority of modern PCs and servers.                                                                       |
 | `linux/arm64`  | `aarch64`     | 64-bit ARM hardware. For example Raspberry Pi 2/3/4 running a 64-bit OS.                                  |
 | `linux/arm/v7` | `armhf`       | 32-bit ARM hardware. For example most Raspberry Pi models running Raspberry Pi OS.                        |
-| `linux/arm/v6` | `armel`       | Older 32-bit ARM hardware. Mostly Raspberry Pi 1/0/0W but there may be others. These images are untested. |
+| `linux/arm/v6` | `armel`       | Older 32-bit ARM hardware. Mostly Raspberry Pi 1/0/0W but there may be others. These images are **untested**. |
 
 
-The public image corresponding to this Dockerfile is `erisamoe/cloudflared` and should work in mostly the same way as the [official image](https://hub.docker.com/r/cloudflare/cloudflared)
+The public image corresponding to this Dockerfile is `erisamoe/cloudflared` and should work in mostly the same way as the [official image](https://hub.docker.com/r/cloudflare/cloudflared).
 
 A basic `docker-compose` example for exposing an internal service would be:
-```yml
-    cloudflared:
-        image: erisamoe/cloudflared
-        container_name: cloudflared
-        volumes:
-            - ./cloudflared:/etc/cloudflared
-        command: --hostname mycontainer.example.com --url http://mycontainer:8080
-        depends_on:
-            - mycontainer
+
+``` yml
+  cloudflared:
+      image: erisamoe/cloudflared
+      container_name: cloudflared
+      volumes:
+        - ./cloudflared:/etc/cloudflared
+      command: --hostname mycontainer.example.com --url http://mycontainer:8080
+      depends_on:
+        - mycontainer
 ```
+
 With `./cloudflared` being a directory containing the certifcate for Argo Tunnel. For more details on `cloudflared` usage, check out the [official docs](https://developers.cloudflare.com/argo-tunnel/)
+
+To acquire a certificate, you'll need to use the `login` command.  
+This will spit out `/.cloudflared/cert.pem`, rather than `/etc/cloudflared`.
+
+As such, usage would be something like:  
+`docker run -v ./cloudflared:/.cloudflared erisamoe/cloudflared login`  
+to create a folder called `cloudflared` in your current dir and deposit a `cert.pem` into it.  
+
+And now you can either use the above compose example or for testing simply just:  
+`docker run -v ./cloudflared:/etc/cloudflared erisamoe/cloudflared --hostname test.example.com --hello-world`  
+Which will start up a "Hello world" test tunnel on `https://test.example.com`.

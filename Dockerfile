@@ -9,16 +9,16 @@ ENV GO111MODULE=on \
 
 WORKDIR /src
 RUN apk --no-cache add git build-base
-RUN export
 RUN git clone https://github.com/cloudflare/cloudflared --depth=1 --branch ${VERSION} .
 RUN make cloudflared
 
 # Runtime container
-FROM alpine
-WORKDIR /app
+FROM scratch
+WORKDIR /
 
 COPY --from=build /src/cloudflared .
+COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 ENV TUNNEL_ORIGIN_CERT=/etc/cloudflared/cert.pem
-ENTRYPOINT ["./cloudflared", "--no-autoupdate"]
+ENTRYPOINT ["/cloudflared", "--no-autoupdate"]
 CMD ["version"]

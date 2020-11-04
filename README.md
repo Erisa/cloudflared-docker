@@ -33,9 +33,13 @@ To acquire a certificate, you'll need to use the `login` command.
 This will spit out `/.cloudflared/cert.pem`, rather than `/etc/cloudflared`.
 
 As such, usage would be something like:  
-`docker run -v ./cloudflared:/.cloudflared erisamoe/cloudflared login`  
+```bash
+docker run -v ./cloudflared:/.cloudflared erisamoe/cloudflared login
+```
 to create a folder called `cloudflared` in your current dir and deposit a `cert.pem` into it.  
 
 And now you can either use the above compose example or for testing simply just:  
-`docker run -v ./cloudflared:/etc/cloudflared erisamoe/cloudflared --hostname test.example.com --hello-world`  
+```bash
+docker run -v ./cloudflared:/etc/cloudflared erisamoe/cloudflared --hostname test.example.com --hello-world
+```
 Which will start up a "Hello world" test tunnel on `https://test.example.com`.

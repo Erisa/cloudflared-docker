@@ -1,5 +1,5 @@
 # Build container
-ARG GOVERSION=1.15.3
+ARG GOVERSION=1.15.5
 FROM golang:$GOVERSION-alpine AS build
 
 ARG VERSION=2020.11.8

@@ -29,6 +29,9 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
+         name: Get Latest Tag
+         uses: WyriHaximus/github-action-get-previous-tag@1.0.0
+      -
         name: Build and push
         uses: docker/build-push-action@v2
         with:
@@ -38,5 +41,6 @@ jobs:
           push: true
           tags: |
             erisamoe/cloudflared:latest
+            erisamoe/cloudflared:${{ steps.previoustag.outputs.tag }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache

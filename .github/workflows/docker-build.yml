@@ -2,7 +2,8 @@ name: docker-build
 
 on:
   push:
-    branches: main
+    branches:
+      - main
 
 jobs:
   multi-platform-build:

@@ -14,6 +14,7 @@ The public image currently supports:
 
 The public image corresponding to this Dockerfile is `erisamoe/cloudflared` and should work in mostly the same way as the [official image](https://hub.docker.com/r/cloudflare/cloudflared).
 
+### Argo Tunnel 
 A basic `docker-compose` example for exposing an internal service would be:
 
 ``` yml
@@ -43,3 +44,15 @@ And now you can either use the above compose example or for testing simply just:
 docker run -v ./cloudflared:/etc/cloudflared erisamoe/cloudflared --hostname test.example.com --hello-world
 ```
 Which will start up a "Hello world" test tunnel on `https://test.example.com`.
+
+### DNS-over-HTTPS
+While not the original intent behind the image, you can also use this to host a DNS resolver that speaks to a DNS-over-HTTPS backend.  
+For example:
+```
+docker run -d -p 53:53/udp --name my-dns-forwarder erisamoe/cloudflared proxy-dns
+```
+Would create a container called `my-dns-forwarder` that responds to DNS requests on your host.  
+Keep in mind when using this on a public server (e.g. VPS) it will by default listen on all interfaces, making you a public DNS resolver on the internet.  
+You can sidestep this by changing the `-p` to instead be `-p 127.0.0.01:53:53/udp` to listen on localhost instead.
+
+You can also add upstreams with `--upstream https://dns.example.com` for example. By default, Cloudflare DNS is used.

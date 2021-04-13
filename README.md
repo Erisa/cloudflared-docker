@@ -1,4 +1,4 @@
-# Erisa's Coudflared Docker Image
+# Erisa's Cloudflared Docker Image
 
 This repository contains a simple Dockerfile to build `cloudflared`, the client for Cloudflare's [Argo Tunnel](https://developers.cloudflare.com/argo-tunnel/), from [source](https://github.com/cloudflare/cloudflared).
 

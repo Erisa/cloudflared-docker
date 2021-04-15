@@ -14,7 +14,7 @@ The public image currently supports:
 
 The public image corresponding to this Dockerfile is `erisamoe/cloudflared` and should work in mostly the same way as the [official image](https://hub.docker.com/r/cloudflare/cloudflared).
 
-### Argo Tunnel 
+### Cloudflare Tunnel (formerly Argo Tunnel) 
 A basic `docker-compose` example for exposing an internal service would be:
 
 ``` yml

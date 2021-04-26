@@ -11,6 +11,7 @@ The public image currently supports:
 | `linux/arm64`  | `aarch64`     | 64-bit ARM hardware. For example Apple Silicon or Raspberry Pi 2/3/4 running a 64-bit OS.                     |
 | `linux/arm/v7` | `armhf`       | 32-bit ARM hardware. For example most Raspberry Pi models running Raspberry Pi OS.                            |
 | `linux/arm/v6` | `armel`       | Older 32-bit ARM hardware. Mostly Raspberry Pi 1/0/0W but there may be others. These images are **untested**. |
+| `linux/s390x`  | `IBM Z`       | [Linux on IBM Z](https://en.wikipedia.org/wiki/Linux_on_IBM_Z) for IBM mainframes, most notable [IBM Cloud](https://www.ibm.com/uk-en/cloud). |
 
 The public image corresponding to this Dockerfile is `erisamoe/cloudflared` and should work in mostly the same way as the [official image](https://hub.docker.com/r/cloudflare/cloudflared).
 

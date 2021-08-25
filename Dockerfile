@@ -1,5 +1,5 @@
 # Build container
-ARG GOVERSION=1.17.0
+ARG GOVERSION=1.16.7
 FROM --platform=${BUILDPLATFORM} \
     golang:$GOVERSION-alpine AS build
 
@@ -9,7 +9,7 @@ RUN apk --no-cache add git build-base
 ENV GO111MODULE=on \
     CGO_ENABLED=0
 
-ARG VERSION=2021.8.2
+ARG VERSION=2021.8.3
 RUN git clone https://github.com/cloudflare/cloudflared --depth=1 --branch ${VERSION} .
 ARG TARGETOS
 ARG TARGETARCH

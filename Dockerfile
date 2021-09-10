@@ -1,5 +1,5 @@
 # Build container
-ARG GOVERSION=1.17.0
+ARG GOVERSION=1.17.1
 FROM --platform=${BUILDPLATFORM} \
     golang:$GOVERSION-alpine AS build
 

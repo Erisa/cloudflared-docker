@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  multi-platform-build:
+  multi-arch-push:
     runs-on: ubuntu-latest
     steps:
       -

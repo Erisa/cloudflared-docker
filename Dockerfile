@@ -1,7 +1,9 @@
 # Build container
-ARG GOVERSION=1.17.3
+ARG GOVERSION=1.17.4
+ARG ALPINEVERSION=3.15
+
 FROM --platform=${BUILDPLATFORM} \
-    golang:$GOVERSION-alpine AS build
+    golang:$GOVERSION-alpine${ALPINEVERSION} AS build
 
 WORKDIR /src
 RUN apk --no-cache add git build-base

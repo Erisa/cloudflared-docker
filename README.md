@@ -1,6 +1,6 @@
 # Erisa's Cloudflared Docker Image
 
-This repository contains a simple Dockerfile to build `cloudflared`, the client for Cloudflare's [Argo Tunnel](https://developers.cloudflare.com/argo-tunnel/), from [source](https://github.com/cloudflare/cloudflared).
+This repository contains a simple Dockerfile to build `cloudflared`, the client for [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps), from [source](https://github.com/cloudflare/cloudflared).
 
 The aim is to support multiple architectures.  
 The public image currently supports:
@@ -29,7 +29,7 @@ A basic `docker-compose` example for exposing an internal service would be:
         - mycontainer
 ```
 
-With `./cloudflared` being a directory containing the certifcate for Argo Tunnel. For more details on `cloudflared` usage, check out the [official docs](https://developers.cloudflare.com/argo-tunnel/)
+With `./cloudflared` being a directory containing the certifcate for Cloudflare Tunnel. For more details on `cloudflared` usage, check out the [official docs](https://developers.cloudflare.com/argo-tunnel/)
 
 To acquire a certificate, you'll need to use the `login` command.  
 This will spit out `/.cloudflared/cert.pem`, rather than `/etc/cloudflared`.

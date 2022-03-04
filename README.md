@@ -29,7 +29,7 @@ A basic `docker-compose` example for exposing an internal service would be:
         - mycontainer
 ```
 
-With `./cloudflared` being a directory containing the certifcate for Cloudflare Tunnel. For more details on `cloudflared` usage, check out the [official docs](https://developers.cloudflare.com/argo-tunnel/)
+With `./cloudflared` being a directory containing the certifcate for Cloudflare Tunnel. For more details on `cloudflared` usage, check out the [official docs](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/)
 
 To acquire a certificate, you'll need to use the `login` command.  
 This will spit out `/.cloudflared/cert.pem`, rather than `/etc/cloudflared`.

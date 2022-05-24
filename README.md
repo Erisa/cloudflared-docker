@@ -17,21 +17,52 @@ The public image currently supports:
 
 The public image corresponding to this Dockerfile is `erisamoe/cloudflared` and should work in mostly the same way as the [official image](https://hub.docker.com/r/cloudflare/cloudflared).
 
-### Cloudflare Tunnel (formerly Argo Tunnel) 
-A basic `docker-compose` example for exposing an internal service would be:
+> **Note**  
+> If you have any problems or questions with this image, either open a GitHub Issue or join the [Cloudflare Developers Discord Server](https://discord.gg/cloudflaredev) and ping `@Erisa#9999` in `#general` or `#off-topic` with your question.
+
+## Cloudflare Tunnel
+
+### Dashboard setup (Recommended)
+A  `docker-compose` example with a Zero Trust dashboard setup would be:
 
 ``` yml
   cloudflared:
       image: erisamoe/cloudflared
-      container_name: cloudflared
-      volumes:
-        - ./cloudflared:/etc/cloudflared
-      command: --hostname mycontainer.example.com --url http://mycontainer:8080
+      restart: unless-stopped
+      command: tunnel run --token $(CLOUDFLARED_TOKEN)
       depends_on:
         - mycontainer
 ```
 
-With `./cloudflared` being a directory containing the certifcate for Cloudflare Tunnel. For more details on `cloudflared` usage, check out the [official docs](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/)
+Where `.env` contains `CLOUDFLARED_TOKEN=` set to the token given by the Zero Trust dashboard.
+For more information see [the Cloudflare Blog](https://blog.cloudflare.com/ridiculously-easy-to-use-tunnels/)
+
+### Config file setup (Named tunnel)
+An example for a setup with a local config would be:
+```yml
+  cloudflared:
+      image: erisamoe/cloudflared
+      restart: unless-stopped
+      volumes:
+        - ./cloudflared:/etc/cloudflared
+      command: tunnel run mytunnel
+      depends_on:
+        - mycontainer
+```
+
+Where `./cloudflared` is a folder containing the `.json` or `.pem` credentials and `config.yml` for a tunnel.
+
+An example `config.yml` might look like:
+```yml
+tunnel: uuid-for-tunnel
+credentials-file: /etc/cloudflared/uuid-for-tunnel.json
+
+ingress:
+  - hostname: mywebsite.com
+    service: http:/nginx:80
+  - service: http_status:404
+```
+For more information, refer to the [Cloudflare Documentation](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/tunnel-guide/#4-create-a-configuration-file)
 
 To acquire a certificate, you'll need to use the `login` command.  
 This will spit out `/.cloudflared/cert.pem`, rather than `/etc/cloudflared`.
@@ -42,13 +73,20 @@ docker run -v $PWD/cloudflared:/.cloudflared erisamoe/cloudflared login
 ```
 to create a folder called `cloudflared` in your current dir and deposit a `cert.pem` into it.  
 
+To create a tunnel, you can then do:
+```bash
+docker run -v $PWD/cloudflared:/.cloudflared erisamoe/cloudflared tunnel create mytunnel
+```
+
+Which gives you a UUID and `.json` credentials file for the tunnel.
+
 And now you can either use the above compose example or for testing simply just:  
 ```bash
-docker run -v $PWD/cloudflared:/etc/cloudflared erisamoe/cloudflared --hostname test.example.com --hello-world
+docker run -v $PWD/cloudflared:/etc/cloudflared erisamoe/cloudflared --hostname test.example.com --name mytunnel --hello-world
 ```
 Which will start up a "Hello world" test tunnel on `https://test.example.com`.
 
-### DNS-over-HTTPS
+## DNS-over-HTTPS
 While not the original intent behind the image, you can also use this to host a DNS resolver that speaks to a DNS-over-HTTPS backend.  
 For example:
 ```

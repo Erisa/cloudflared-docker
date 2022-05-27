@@ -29,7 +29,7 @@ A  `docker-compose` example with a Zero Trust dashboard setup would be:
   cloudflared:
       image: erisamoe/cloudflared
       restart: unless-stopped
-      command: tunnel run --token $(CLOUDFLARED_TOKEN)
+      command: tunnel run --token ${CLOUDFLARED_TOKEN}
       depends_on:
         - mycontainer
 ```

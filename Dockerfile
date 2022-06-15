@@ -11,8 +11,9 @@ RUN apk --no-cache add git build-base
 ENV GO111MODULE=on \
     CGO_ENABLED=0
 
-ARG VERSION=2022.6.0
-RUN git clone https://github.com/cloudflare/cloudflared --depth=1 --branch ${VERSION} .
+ARG VERSION=f2339a72445ec1e0b5e5c49d3e0b42a6b6930a33
+RUN git clone https://github.com/cloudflare/cloudflared .
+RUN git checkout ${VERSION}
 ARG TARGETOS
 ARG TARGETARCH
 RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} make cloudflared

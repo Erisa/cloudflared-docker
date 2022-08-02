@@ -26,28 +26,34 @@ The public image corresponding to this Dockerfile is `erisamoe/cloudflared` and 
 A  `docker-compose` example with a Zero Trust dashboard setup would be:
 
 ``` yml
+services:
   cloudflared:
-      image: erisamoe/cloudflared
-      restart: unless-stopped
-      command: tunnel run --token ${CLOUDFLARED_TOKEN}
-      depends_on:
-        - mycontainer
+    image: erisamoe/cloudflared
+    restart: unless-stopped
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+    depends_on:
+      - mycontainer
 ```
 
-Where `.env` contains `CLOUDFLARED_TOKEN=` set to the token given by the Zero Trust dashboard.
+Where `.env` contains `TUNNEL_TOKEN=` set to the token given by the Zero Trust dashboard.
 For more information see [the Cloudflare Blog](https://blog.cloudflare.com/ridiculously-easy-to-use-tunnels/)
+
+> **Note** A previous version of this README recommended using `--token ${CLOUDFLARED_TOKEN`, which is a less secure way of handing off the token. Setting the `TUNNEL_TOKEN` variable seems to be a better way of approaching this. 
 
 ### Config file setup (Named tunnel)
 An example for a setup with a local config would be:
 ```yml
+services:
   cloudflared:
-      image: erisamoe/cloudflared
-      restart: unless-stopped
-      volumes:
-        - ./cloudflared:/etc/cloudflared
-      command: tunnel run mytunnel
-      depends_on:
-        - mycontainer
+    image: erisamoe/cloudflared
+    restart: unless-stopped
+    volumes:
+      - ./cloudflared:/etc/cloudflared
+    command: tunnel run mytunnel
+    depends_on:
+      - mycontainer
 ```
 
 Where `./cloudflared` is a folder containing the `.json` or `.pem` credentials and `config.yml` for a tunnel.

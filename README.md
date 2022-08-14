@@ -68,7 +68,7 @@ credentials-file: /etc/cloudflared/uuid-for-tunnel.json
 
 ingress:
   - hostname: mywebsite.com
-    service: http:/nginx:80
+    service: http://nginx:80
   - service: http_status:404
 ```
 For more information, refer to the [Cloudflare Documentation](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/tunnel-guide/#4-create-a-configuration-file)

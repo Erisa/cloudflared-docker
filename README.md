@@ -2,7 +2,7 @@
 
 This repository contains a simple Dockerfile to build `cloudflared`, the client for [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps), from [source](https://github.com/cloudflare/cloudflared).
 
-> **Note**
+> **Note**\
 > This Docker image is not an official Cloudflare product.
 
 The aim is to support multiple architectures.  

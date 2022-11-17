@@ -87,7 +87,7 @@ to create a folder called `cloudflared` in your current dir and deposit a `cert.
 
 To create a tunnel, you can then do:
 ```bash
-docker run -v $PWD/cloudflared:/.cloudflared erisamoe/cloudflared tunnel create mytunnel
+docker run -v $PWD/cloudflared:/etc/cloudflared erisamoe/cloudflared tunnel create mytunnel
 ```
 
 Which gives you a UUID and `.json` credentials file for the tunnel.

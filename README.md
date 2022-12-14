@@ -81,7 +81,7 @@ This will spit out `/.cloudflared/cert.pem`, rather than `/etc/cloudflared`.
 
 As such, usage would be something like:  
 ```bash
-docker run -v $PWD/cloudflared:/.cloudflared erisamoe/cloudflared login
+docker run -v $PWD/cloudflared:/etc/cloudflared erisamoe/cloudflared login
 ```
 to create a folder called `cloudflared` in your current dir and deposit a `cert.pem` into it.  
 

@@ -26,7 +26,7 @@ The public image corresponding to this Dockerfile is `erisamoe/cloudflared` and 
 ## Cloudflare Tunnel
 
 > **Warning**   
-> Legacy Tunnels are becoming unsupported. You should migrate all existing legacy tunnels to Named Tunnels by October 1, 2022.
+> Legacy Tunnels are unsupported. You should migrate all existing legacy tunnels to Named Tunnels.
 
 ### Dashboard setup (Recommended)
 A  `docker-compose` example with a Zero Trust dashboard setup would be:
@@ -43,10 +43,10 @@ services:
       - mycontainer
 ```
 
-Where `.env` contains `TUNNEL_TOKEN=` set to the token given by the Zero Trust dashboard.
+Where an `.env` file in the same directory contains `TUNNEL_TOKEN=` set to the token given by the Zero Trust dashboard.
 For more information see [the Cloudflare Blog](https://blog.cloudflare.com/ridiculously-easy-to-use-tunnels/)
 
-> **Note** A previous version of this README recommended using `--token ${CLOUDFLARED_TOKEN`, which is a less secure way of handing off the token. Setting the `TUNNEL_TOKEN` variable seems to be a better way of approaching this. 
+> **Note** A previous version of this README recommended using `--token ${CLOUDFLARED_TOKEN}`, which is a less secure way of handing off the token. Setting the `TUNNEL_TOKEN` variable seems to be a better way of approaching this. 
 
 ### Config file setup (Named tunnel)
 An example for a setup with a local config would be:
@@ -67,7 +67,8 @@ Where `./cloudflared` is a folder containing the `.json` or `.pem` credentials a
 An example `config.yml` might look like:
 ```yml
 tunnel: uuid-for-tunnel
-credentials-file: /etc/cloudflared/uuid-for-tunnel.json
+#Optional
+#credentials-file: /etc/cloudflared/uuid-for-tunnel.json
 
 ingress:
   - hostname: mywebsite.com
@@ -90,7 +91,7 @@ To create a tunnel, you can then do:
 docker run -v $PWD/cloudflared:/etc/cloudflared erisamoe/cloudflared tunnel create mytunnel
 ```
 
-Which gives you a UUID and `.json` credentials file for the tunnel.
+Which gives you a UUID for the new tunnel and and a `.json` credentials file corresponding to it.
 
 And now you can either use the above compose example or for testing simply just:  
 ```bash

@@ -1,5 +1,5 @@
 # Build container
-ARG GOVERSION=1.19.8
+ARG GOVERSION=1.20.4
 ARG ALPINEVERSION=3.17
 
 FROM --platform=${BUILDPLATFORM} \
@@ -11,7 +11,7 @@ RUN apk --no-cache add git build-base
 ENV GO111MODULE=on \
     CGO_ENABLED=0
 
-ARG VERSION=2023.5.0
+ARG VERSION=2023.5.1
 RUN git clone https://github.com/cloudflare/cloudflared --depth=1 --branch ${VERSION} .
 ARG TARGETOS
 ARG TARGETARCH

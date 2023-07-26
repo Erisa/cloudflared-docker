@@ -21,7 +21,7 @@ The public image currently supports:
 The public image corresponding to this Dockerfile is `erisamoe/cloudflared` and should work in mostly the same way as the [official image](https://hub.docker.com/r/cloudflare/cloudflared).
 
 > **Note**  
-> If you have any problems or questions with this image, either open a GitHub Issue or join the [Cloudflare Developers Discord Server](https://discord.gg/cloudflaredev) and ping `@Erisa | Support Engineer` in `#general` or `#off-topic` with your question.
+> If you have any problems or questions with this image, either open a GitHub Issue or join the [Cloudflare Developers Discord Server](https://discord.gg/cloudflaredev) and ping `@Erisa | Support Engineer` in `#general-help`, `#general-discussions` or `#off-topic` with your question.
 
 ## Cloudflare Tunnel
 

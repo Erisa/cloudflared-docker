@@ -2,8 +2,8 @@
 
 This repository contains a simple Dockerfile to build `cloudflared`, the client for [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps), from [source](https://github.com/cloudflare/cloudflared).
 
-> **Note**\
-> This Docker image is not an official Cloudflare product.
+> [!NOTE]
+> This Docker image is **not** an official Cloudflare product.
 
 The aim is to support multiple architectures.  
 The public image currently supports:
@@ -20,12 +20,12 @@ The public image currently supports:
 
 The public image corresponding to this Dockerfile is `erisamoe/cloudflared` and should work in mostly the same way as the [official image](https://hub.docker.com/r/cloudflare/cloudflared).
 
-> **Note**  
+> [!NOTE]
 > If you have any problems or questions with this image, either open a GitHub Issue or join the [Cloudflare Developers Discord Server](https://discord.gg/cloudflaredev) and ping `@Erisa | Support Engineer` in `#general-help`, `#general-discussions` or `#off-topic` with your question.
 
 ## Cloudflare Tunnel
 
-> **Warning**   
+> [!WARNING]
 > Legacy Tunnels are unsupported. You should migrate all existing legacy tunnels to Named Tunnels.
 
 ### Dashboard setup (Recommended)

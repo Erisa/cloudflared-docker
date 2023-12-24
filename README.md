@@ -35,7 +35,7 @@ A  `docker-compose` example with a Zero Trust dashboard setup would be:
 services:
   cloudflared:
     image: erisamoe/cloudflared
-    restart: unless-stopped
+    restart: always
     command: tunnel run
     environment:
       - TUNNEL_TOKEN=${TUNNEL_TOKEN}
@@ -54,7 +54,7 @@ An example for a setup with a local config would be:
 services:
   cloudflared:
     image: erisamoe/cloudflared
-    restart: unless-stopped
+    restart: always
     volumes:
       - ./cloudflared:/etc/cloudflared
     command: tunnel run mytunnel

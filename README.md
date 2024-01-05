@@ -103,7 +103,7 @@ Which will start up a "Hello world" test tunnel on `https://test.example.com`.
 While not the original intent behind the image, you can also use this to host a DNS resolver that speaks to a DNS-over-HTTPS backend.  
 For example:
 ```
-docker run -d -p 53:53/udp --name my-dns-forwarder erisamoe/cloudflared proxy-dns
+docker run -d -p 53:53/udp --name my-dns-forwarder erisamoe/cloudflared proxy-dns --address 0.0.0.0
 ```
 Would create a container called `my-dns-forwarder` that responds to DNS requests on your host.  
 Keep in mind when using this on a public server (e.g. VPS) it will by default listen on all interfaces, making you a public DNS resolver on the internet.  

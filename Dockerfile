@@ -6,15 +6,16 @@ FROM --platform=${BUILDPLATFORM} \
     golang:$GOVERSION-alpine${ALPINEVERSION} AS build
 
 WORKDIR /src
-RUN apk --no-cache add git build-base
+RUN apk --no-cache add git build-base bash
 
 ENV GO111MODULE=on \
     CGO_ENABLED=0
 
-ARG VERSION=2023.10.0
+ARG VERSION=2024.1.2
 RUN git clone https://github.com/cloudflare/cloudflared --depth=1 --branch ${VERSION} .
 ARG TARGETOS
 ARG TARGETARCH
+RUN bash -x .teamcity/install-cloudflare-go.sh
 RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} make cloudflared
 
 # Runtime container

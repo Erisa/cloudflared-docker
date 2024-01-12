@@ -54,7 +54,7 @@ An example for a setup with a local config would be:
 services:
   cloudflared:
     image: erisamoe/cloudflared
-    restart: unless-stopped
+    restart: unless-stopped # or 'always' to survive container stops
     volumes:
       - ./cloudflared:/etc/cloudflared
     command: tunnel run mytunnel

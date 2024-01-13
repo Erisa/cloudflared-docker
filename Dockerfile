@@ -13,9 +13,11 @@ ENV GO111MODULE=on \
 
 ARG VERSION=2024.1.2
 RUN git clone https://github.com/cloudflare/cloudflared --depth=1 --branch ${VERSION} .
+RUN bash -x .teamcity/install-cloudflare-go.sh
+
+# From this point on, step(s) are duplicated per-architecture
 ARG TARGETOS
 ARG TARGETARCH
-RUN bash -x .teamcity/install-cloudflare-go.sh
 RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} make cloudflared
 
 # Runtime container

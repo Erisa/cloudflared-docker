@@ -28,5 +28,6 @@ COPY --from=build /src/cloudflared .
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 ENV TUNNEL_ORIGIN_CERT=/etc/cloudflared/cert.pem
+ENV NO_AUTOUPDATE=true
 ENTRYPOINT ["/cloudflared", "--no-autoupdate"]
 CMD ["version"]

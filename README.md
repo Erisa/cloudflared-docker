@@ -25,9 +25,6 @@ The public image corresponding to this Dockerfile is `erisamoe/cloudflared` and 
 
 ## Cloudflare Tunnel
 
-> [!WARNING]
-> Legacy Tunnels are unsupported. You should migrate all existing legacy tunnels to Named Tunnels.
-
 ### Dashboard setup (Recommended)
 A  `docker-compose` example with a Zero Trust dashboard setup would be:
 

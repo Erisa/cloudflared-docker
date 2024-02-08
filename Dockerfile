@@ -18,7 +18,10 @@ RUN bash -x .teamcity/install-cloudflare-go.sh
 # From this point on, step(s) are duplicated per-architecture
 ARG TARGETOS
 ARG TARGETARCH
-RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} make cloudflared
+ARG TARGETVARIANT
+# Fixes execution on linux/arm/v6 for devices that don't support armv7 binaries
+RUN if [ "${TARGETVARIANT}" = "v6" ] && [ "${TARGETARCH}" = "arm" ]; then export GOARM=6; fi; \
+    GOOS=${TARGETOS} GOARCH=${TARGETARCH} make cloudflared
 
 # Runtime container
 FROM scratch

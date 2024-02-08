@@ -14,7 +14,7 @@ The public image currently supports:
 | `linux/386`    | `x86`         | 32-bit Intel/AMD CPUs. Typically really old computer hardware. These images are **untested**.                 |
 | `linux/arm64`  | `aarch64`     | 64-bit ARM hardware. For example Apple Silicon or Raspberry Pi 2/3/4 running a 64-bit OS.                     |
 | `linux/arm/v7` | `armhf`       | 32-bit ARM hardware. For example most Raspberry Pi models running Raspberry Pi OS.                            |
-| `linux/arm/v6` | `armel`       | Older 32-bit ARM hardware. Mostly Raspberry Pi 1/0/0W but there may be others. These images are **untested**. |
+| `linux/arm/v6` | `armel`       | Older 32-bit ARM hardware. Mostly Raspberry Pi 1/0/0W but there may be others.                                |
 | `linux/s390x`  | `IBM Z`       | [Linux on IBM Z](https://en.wikipedia.org/wiki/Linux_on_IBM_Z) for IBM mainframes, most notably [IBM Cloud](https://www.ibm.com/uk-en/cloud). |
 | `linux/ppc64le` | `ppc64el`     | Tested on [IBM Cloud Power Systems Virtual Server](https://www.ibm.com/uk-en/products/power-virtual-server)
 

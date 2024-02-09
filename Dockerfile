@@ -21,7 +21,7 @@ ARG TARGETARCH
 ARG TARGETVARIANT
 # Fixes execution on linux/arm/v6 for devices that don't support armv7 binaries
 RUN if [ "${TARGETVARIANT}" = "v6" ] && [ "${TARGETARCH}" = "arm" ]; then export GOARM=6; fi; \
-    GOOS=${TARGETOS} GOARCH=${TARGETARCH} make cloudflared
+    GOOS=${TARGETOS} GOARCH=${TARGETARCH} make LINK_FLAGS="-w -s" cloudflared 
 
 # Runtime container
 FROM scratch

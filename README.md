@@ -17,6 +17,7 @@ The public image currently supports:
 | `linux/arm/v6` | `armel`       | Older 32-bit ARM hardware. Mostly Raspberry Pi 1/0/0W but there may be others.                                |
 | `linux/s390x`  | `IBM Z`       | [Linux on IBM Z](https://en.wikipedia.org/wiki/Linux_on_IBM_Z) for IBM mainframes, most notably [IBM Cloud](https://www.ibm.com/uk-en/cloud). |
 | `linux/ppc64le` | `ppc64el`     | Tested on [IBM Cloud Power Systems Virtual Server](https://www.ibm.com/uk-en/products/power-virtual-server)
+| `linux/riscv64` | `riscv64`     | CPUs from the future. Tested on [Scaleway Labs RV1](https://labs.scaleway.com/en/em-rv1/).
 
 The public image corresponding to this Dockerfile is `erisamoe/cloudflared` and should work in mostly the same way as the [official image](https://hub.docker.com/r/cloudflare/cloudflared).
 

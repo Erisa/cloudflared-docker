@@ -11,15 +11,15 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       -
         name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
       -
         name: Cache Docker layers
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-${{ github.sha }}
@@ -27,14 +27,14 @@ jobs:
             ${{ runner.os }}-buildx-
       - 
         name: Login to GitHub Registry
-        uses: docker/login-action@v2 
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
       -
         name: Login to DockerHub
-        uses: docker/login-action@v2 
+        uses: docker/login-action@v3
         with:
           username: erisamoe
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -44,7 +44,7 @@ jobs:
          uses: WyriHaximus/github-action-get-previous-tag@385a2a0b6abf6c2efeb95adfac83d96d6f968e0c # pin@v1.3.0
       -
         name: Build and push
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile

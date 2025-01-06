@@ -3,11 +3,11 @@ name: docker-build
 on:
   push:
     branches:
-      - main
+      - '*'
 
 jobs:
   multi-arch-push:
-    runs-on: ubuntu-latest
+    runs-on: ubicloud-standard-16
     steps:
       -
         name: Checkout
@@ -49,7 +49,7 @@ jobs:
           context: .
           file: ./Dockerfile
           platforms: linux/amd64,linux/386,linux/arm64,linux/arm/v7,linux/arm/v6,linux/s390x,linux/ppc64le,linux/riscv64
-          push: true
+          push: ${{ github.ref == 'refs/heads/main' }}
           tags: |
             erisamoe/cloudflared:latest
             erisamoe/cloudflared:${{ steps.previoustag.outputs.tag }}

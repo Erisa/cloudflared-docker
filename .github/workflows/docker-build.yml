@@ -10,7 +10,7 @@ on:
       - '**'        # matches every branch
 
 jobs:
-  multi-arch-push:
+  multi-arch-docker:
     runs-on: ubicloud-standard-16
     steps:
       -

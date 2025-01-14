@@ -11,7 +11,7 @@ RUN apk --no-cache add git build-base bash
 ENV GO111MODULE=on \
     CGO_ENABLED=0
 
-ARG VERSION=2024.12.2
+ARG VERSION=2025.1.0
 RUN git clone https://github.com/cloudflare/cloudflared --depth=1 --branch ${VERSION} .
 RUN bash -x .teamcity/install-cloudflare-go.sh
 
@@ -21,7 +21,7 @@ ARG TARGETARCH
 ARG TARGETVARIANT
 # Fixes execution on linux/arm/v6 for devices that don't support armv7 binaries
 RUN if [ "${TARGETVARIANT}" = "v6" ] && [ "${TARGETARCH}" = "arm" ]; then export GOARM=6; fi; \
-    GOOS=${TARGETOS} GOARCH=${TARGETARCH} make LINK_FLAGS="-w -s" cloudflared 
+    GOOS=${TARGETOS} GOARCH=${TARGETARCH} CONTAINER_BUILD=1 make LINK_FLAGS="-w -s" cloudflared 
 
 # Runtime container
 FROM scratch

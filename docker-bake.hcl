@@ -1,0 +1,36 @@
+variable "CLOUDFLARED_VERSION" {
+    default = "2025.4.2"
+}
+
+variable "LATEST" {
+    default = true
+}
+
+variable "MULTI_PLATFORM" {
+    default = false
+}
+
+target "default" {
+    target = "build"
+    args = {
+        VERSION = "${CLOUDFLARED_VERSION}"
+        GOVERSION = "1.23.9"
+        ALPINEVERSION = "3.21"
+    }
+    platforms = !MULTI_PLATFORM ? null : [
+        "linux/amd64",
+        "linux/386",
+        "linux/arm64",
+        "linux/arm/v7",
+        "linux/arm/v6",
+        "linux/s390x",
+        "linux/ppc64le",
+        "linux/riscv64"
+    ]
+    tags = [
+        "erisamoe/cloudflared:${CLOUDFLARED_VERSION}",
+        "ghcr.io/erisa/cloudflared:${CLOUDFLARED_VERSION}",
+        LATEST ? "erisamoe/cloudflared:latest" : "",
+        LATEST ? "ghcr.io/erisa/cloudflared:latest" : "",
+    ]
+}

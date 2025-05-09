@@ -33,7 +33,7 @@ jobs:
         env:
           MULTI_PLATFORM: true
         with:
-          push: ${{ github.ref == 'ref/heads/main' }}
+          push: ${{ github.ref == 'refs/heads/main' }}
           set: |
             *.cache-from=type=gha
             *.cache-to=type=gha,mode=max

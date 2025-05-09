@@ -10,20 +10,12 @@ variable "MULTI_PLATFORM" {
     default = false
 }
 
-variable "GOVERSION" {
-    default = "1.23.9"
-}
-
-variable "ALPINEVERSION" {
-    default = "3.21"
-}
-
 target "default" {
     target = "build"
     args = {
-        VERSION = CLOUDFLARED_VERSION
-        GOVERSION = GOVERSION
-        ALPINEVERSION = ALPINEVERSION
+        VERSION = "${CLOUDFLARED_VERSION}"
+        GOVERSION = "1.23.9"
+        ALPINEVERSION = "3.21"
     }
     platforms = !MULTI_PLATFORM ? null : [
         "linux/amd64",

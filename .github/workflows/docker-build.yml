@@ -2,7 +2,8 @@ name: docker-build
 
 on:
   push:
-  pull_request:
+    branches:
+      - main
 
 jobs:
   multi-arch-push:
@@ -11,9 +12,19 @@ jobs:
       -
         name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+      -
+        name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
       - 
         name: Login to GitHub Registry
         uses: docker/login-action@v3
@@ -28,12 +39,21 @@ jobs:
           username: erisamoe
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
-        name: Bake image
-        uses: docker/bake-action@v6
-        env:
-          MULTI_PLATFORM: true
+         name: Get Latest Tag
+         id: previoustag
+         uses: WyriHaximus/github-action-get-previous-tag@04e8485ecb6487243907e330d522ff60f02283ce # pin@v1.4.0
+      -
+        name: Build and push
+        uses: docker/build-push-action@v5
         with:
-          push: ${{ github.ref == 'ref/heads/main' }}
-          set: |
-            *.cache-from=type=gha
-            *.cache-to=type=gha,mode=max
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64,linux/386,linux/arm64,linux/arm/v7,linux/arm/v6,linux/s390x,linux/ppc64le,linux/riscv64
+          push: true
+          tags: |
+            erisamoe/cloudflared:latest
+            erisamoe/cloudflared:${{ steps.previoustag.outputs.tag }}
+            ghcr.io/erisa/cloudflared:latest
+            ghcr.io/erisa/cloudflared:${{ steps.previoustag.outputs.tag }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache

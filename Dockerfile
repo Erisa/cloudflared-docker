@@ -1,5 +1,5 @@
 # Build container
-ARG GOVERSION=1.23
+ARG GOVERSION=1.24
 ARG ALPINEVERSION
 
 FROM --platform=${BUILDPLATFORM} \
@@ -13,7 +13,6 @@ ENV GO111MODULE=on \
 
 ARG VERSION=master
 RUN git clone https://github.com/cloudflare/cloudflared --depth=1 --branch ${VERSION} .
-RUN bash -x .teamcity/install-cloudflare-go.sh
 
 # From this point on, step(s) are duplicated per-architecture
 ARG TARGETOS

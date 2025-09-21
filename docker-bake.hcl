@@ -11,7 +11,7 @@ variable "MULTI_PLATFORM" {
 }
 
 variable "GOVERSION" {
-    default = "1.24.6"
+    default = "1.24.7"
 }
 
 variable "ALPINEVERSION" {

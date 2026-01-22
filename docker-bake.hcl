@@ -1,5 +1,5 @@
 variable "CLOUDFLARED_VERSION" {
-    default = "2025.11.1"
+    default = "2026.1.1"
 }
 
 variable "LATEST" {

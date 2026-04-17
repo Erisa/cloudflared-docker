@@ -18,11 +18,16 @@ variable "ALPINEVERSION" {
     default = "3.23"
 }
 
+variable "GOHASH" {
+    default = "98e6cffc31ccc44c7c15d83df1d69891efee8115a5bb7ede2bf30a38af3e3c92"
+}
+
 target "default" {
     args = {
         VERSION = CLOUDFLARED_VERSION
         GOVERSION = GOVERSION
         ALPINEVERSION = ALPINEVERSION
+        GOHASH = GOHASH
     }
     platforms = !MULTI_PLATFORM ? null : [
         "linux/amd64",

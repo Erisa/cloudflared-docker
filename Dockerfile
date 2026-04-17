@@ -1,9 +1,9 @@
 # Build container
-ARG GOVERSION=1.25
+ARG GOVERSION=1.26
 ARG ALPINEVERSION
 
 FROM --platform=${BUILDPLATFORM} \
-    golang@sha256:98e6cffc31ccc44c7c15d83df1d69891efee8115a5bb7ede2bf30a38af3e3c92 AS build
+    golang@sha256:f85330846cde1e57ca9ec309382da3b8e6ae3ab943d2739500e08c86393a21b1 AS build
 
 WORKDIR /src
 RUN apk --no-cache add git build-base bash

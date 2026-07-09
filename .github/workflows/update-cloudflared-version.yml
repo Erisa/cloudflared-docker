@@ -1,0 +1,93 @@
+name: update-cloudflared-version
+
+on:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve latest cloudflared release tag
+        id: release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const release = await github.rest.repos.getLatestRelease({
+              owner: 'cloudflare',
+              repo: 'cloudflared'
+            });
+
+            if (!release?.data?.tag_name) {
+              core.setFailed('Failed to resolve cloudflared release tag');
+              return;
+            }
+
+            core.setOutput('latest_tag', release.data.tag_name);
+
+      - name: Update CLOUDFLARED_VERSION in docker-bake.hcl
+        id: update
+        env:
+          LATEST_TAG: ${{ steps.release.outputs.latest_tag }}
+        run: |
+          set -euo pipefail
+          current_version="$(awk '
+            BEGIN { in_block = 0 }
+            /^variable "CLOUDFLARED_VERSION" \{/ { in_block = 1; next }
+            in_block && /^[[:space:]]*default = "/ {
+              gsub(/^[[:space:]]*default = "/, "")
+              gsub(/"$/, "")
+              print
+              exit
+            }
+          ' docker-bake.hcl)"
+
+          if [ -z "$current_version" ]; then
+            echo "Unable to parse current CLOUDFLARED_VERSION from docker-bake.hcl"
+            exit 1
+          fi
+
+          if [ "$current_version" = "$LATEST_TAG" ]; then
+            echo "No update needed. Already at $current_version"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          awk -v latest="$LATEST_TAG" '
+            BEGIN { in_block = 0 }
+            /^variable "CLOUDFLARED_VERSION" \{/ { in_block = 1 }
+            in_block && /^[[:space:]]*default = "/ {
+              sub(/"[^"]+"/, "\"" latest "\"")
+              in_block = 0
+            }
+            { print }
+          ' docker-bake.hcl > docker-bake.hcl.tmp
+
+          mv docker-bake.hcl.tmp docker-bake.hcl
+
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+          echo "current_version=$current_version" >> "$GITHUB_OUTPUT"
+          echo "new_version=$LATEST_TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Create pull request
+        if: steps.update.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: chore/update-cloudflared-${{ steps.update.outputs.new_version }}
+          commit-message: "chore: update cloudflared to ${{ steps.update.outputs.new_version }}"
+          title: "chore: update cloudflared to ${{ steps.update.outputs.new_version }}"
+          body: |
+            Automated update of `CLOUDFLARED_VERSION` in `docker-bake.hcl`.
+
+            - Previous version: `${{ steps.update.outputs.current_version }}`
+            - New version: `${{ steps.update.outputs.new_version }}`
+
+            Source: `cloudflare/cloudflared` latest GitHub release tag.

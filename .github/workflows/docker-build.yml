@@ -3,6 +3,7 @@ name: docker-build
 on:
   push:
   pull_request:
+  workflow_dispatch:
 
 jobs:
   multi-arch-push:
@@ -39,3 +40,58 @@ jobs:
           set: |
             *.cache-from=type=gha
             *.cache-to=type=gha,mode=max
+
+  smoke-test:
+    name: smoke-test (${{ matrix.platform }})
+    runs-on: ${{ matrix.runner || 'ubuntu-latest' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux/amd64
+          - platform: linux/386
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
+          # Emulate the oldest CPUs each image is meant for: Raspberry Pi 2
+          # for v7, and Pi 1/Zero for v6 so ARMv7-only instructions get caught
+          - platform: linux/arm/v7
+            qemu: true
+            qemu-cpu: cortex-a7
+          - platform: linux/arm/v6
+            qemu: true
+            qemu-cpu: arm1176
+          - platform: linux/s390x
+            qemu: true
+          - platform: linux/ppc64le
+            qemu: true
+          - platform: linux/riscv64
+            qemu: true
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
+        name: Set up QEMU
+        if: ${{ matrix.qemu }}
+        uses: docker/setup-qemu-action@v3
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      -
+        name: Bake image
+        uses: docker/bake-action@v6
+        with:
+          source: .
+          load: true
+          set: |
+            *.platform=${{ matrix.platform }}
+            *.tags=cloudflared:smoke-test
+            *.cache-from=type=gha
+      -
+        name: Run hello world tunnel
+        env:
+          PLATFORM: ${{ matrix.platform }}
+          QEMU_CPU: ${{ matrix.qemu-cpu }}
+        run: |
+          version=$(docker buildx bake --print --progress=quiet | jq -r .target.default.args.VERSION)
+          .github/scripts/smoke-test.sh cloudflared:smoke-test "$version"

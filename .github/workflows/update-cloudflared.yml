@@ -1,0 +1,168 @@
+name: update-cloudflared
+
+on:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: cloudflared release to update to, if not the latest
+        required: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+
+concurrency: update-cloudflared
+
+env:
+  BRANCH: update-cloudflared
+  BOT_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+  # How long a passing update waits for objections before it's merged
+  GRACE_HOURS: 24
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Merge tested update
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          pr=$(gh pr list --head "$BRANCH" --state open --json number,isCrossRepository --jq '[.[] | select(.isCrossRepository | not)][0].number // empty')
+          if [ -z "$pr" ]; then
+            exit 0
+          fi
+
+          info=$(gh pr view "$pr" --json headRefOid,labels,commits)
+          if [ "$(jq '[.commits[].authors[] | select(.email != env.BOT_EMAIL)] | length' <<<"$info")" != 0 ]; then
+            echo "::notice::#$pr has commits from someone else, so it needs merging by hand"
+            exit 0
+          fi
+          if jq -e '.labels | any(.name == "hold")' <<<"$info" >/dev/null; then
+            echo "::notice::#$pr is on hold"
+            exit 0
+          fi
+          sha=$(jq -r .headRefOid <<<"$info")
+          pushed=$(jq -r '.commits[-1].committedDate' <<<"$info")
+
+          run=$(gh api "repos/$GH_REPO/actions/workflows/docker-build.yml/runs?branch=$BRANCH&event=workflow_dispatch&head_sha=$sha&per_page=1" --jq '.workflow_runs[0] // empty')
+          if [ -z "$run" ]; then
+            echo "No build of $sha found, starting one"
+            gh workflow run docker-build.yml --ref "$BRANCH"
+            exit 0
+          fi
+          url=$(jq -r .html_url <<<"$run")
+          if [ "$(jq -r .status <<<"$run")" != completed ]; then
+            echo "The build of $sha is still running: $url"
+            exit 0
+          fi
+          if [ "$(jq -r .conclusion <<<"$run")" != success ]; then
+            # Quick tunnels are best effort, so give a failure one retry
+            if [ "$(jq -r .run_attempt <<<"$run")" = 1 ]; then
+              echo "The build of $sha failed, retrying it: $url"
+              gh run rerun "$(jq -r .id <<<"$run")" --failed
+              exit 0
+            fi
+            marker="<!-- build failed: $sha -->"
+            if ! gh pr view "$pr" --json comments --jq '.comments[].body' | grep -qF "$marker"; then
+              gh pr comment "$pr" --body "@$OWNER The build or smoke test failed, so this won't be merged automatically: $url $marker"
+            fi
+            exit 0
+          fi
+
+          age=$(($(date +%s) - $(date -d "$pushed" +%s)))
+          if [ "$age" -lt $((GRACE_HOURS * 3600)) ]; then
+            echo "#$pr passed, it'll be merged $GRACE_HOURS hours after its last update"
+            exit 0
+          fi
+          gh pr merge "$pr" --squash --match-head-commit "$sha"
+          # Merges made with GITHUB_TOKEN don't trigger the push build, so publish by hand
+          gh workflow run docker-build.yml --ref main
+          gh pr comment "$pr" --body "Passed and had no objections for $GRACE_HOURS hours, so merged automatically. [Publishing]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/workflows/docker-build.yml?query=branch%3Amain)"
+
+  update:
+    needs: merge
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+      -
+        name: Update versions
+        id: update
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_VERSION: ${{ inputs.version }}
+        run: .github/scripts/update-versions.sh
+      -
+        name: Open pull request
+        if: ${{ steps.update.outputs.changed == 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          OLD_VERSION: ${{ steps.update.outputs.old_version }}
+          VERSION: ${{ steps.update.outputs.version }}
+          OLD_GO: ${{ steps.update.outputs.old_go }}
+          GO: ${{ steps.update.outputs.go }}
+          TITLE: ${{ steps.update.outputs.title }}
+        run: |
+          # --head also matches branches of the same name in forks
+          own='[.[] | select(.isCrossRepository | not)]'
+
+          pr=$(gh pr list --head "$BRANCH" --state open --json number,isCrossRepository --jq "${own}[0].number // empty")
+          if [ -n "$pr" ]; then
+            # Once someone else pushes to the branch, e.g. to fix the build, it's
+            # theirs and this workflow stops force-pushing over it
+            others=$(gh pr view "$pr" --json commits --jq '[.commits[].authors[] | select(.email != env.BOT_EMAIL)] | length')
+            if [ "$others" != 0 ]; then
+              echo "::notice::#$pr has commits from someone else, leaving it alone"
+              exit 0
+            fi
+            git fetch --quiet --depth=1 origin "$BRANCH"
+            if git diff --quiet FETCH_HEAD -- docker-bake.hcl Dockerfile; then
+              echo "#$pr is already up to date"
+              exit 0
+            fi
+          elif gh pr list --head "$BRANCH" --state closed --limit 20 --json title,isCrossRepository --jq "${own}[].title" |
+            grep -qE "^Upgrade cloudflared to ${VERSION//./\\.}(,|$)"; then
+            echo "::notice::The update to $VERSION was closed without merging, not reopening it"
+            exit 0
+          fi
+
+          git config user.name 'github-actions[bot]'
+          git config user.email "$BOT_EMAIL"
+          git switch -C "$BRANCH"
+          git commit -am "$TITLE"
+          git push --force origin "$BRANCH"
+
+          go="\`$OLD_GO\` (unchanged)"
+          if [ "$GO" != "$OLD_GO" ]; then
+            go="\`$OLD_GO\` → \`$GO\`"
+          fi
+          body=$(cat <<EOF
+          - cloudflared: \`$OLD_VERSION\` → \`$VERSION\` ([release notes](https://github.com/cloudflare/cloudflared/releases/tag/$VERSION), [changes](https://github.com/cloudflare/cloudflared/compare/$OLD_VERSION...$VERSION))
+          - Go: $go
+
+          GitHub doesn't run CI by itself on pull requests opened by Actions, so the multi-arch build and hello world smoke tests are [run on this branch by hand]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/workflows/docker-build.yml?query=branch%3A$BRANCH).
+
+          If they pass, this is merged and published automatically $GRACE_HOURS hours after its last update. It's updated in place if a newer release comes out first. To stop that:
+          - close it to skip this version
+          - add the \`hold\` label to wait
+          - push a commit to it, e.g. to fix the build, and it'll be left for merging by hand
+          EOF
+          )
+
+          if [ -n "$pr" ]; then
+            gh pr edit "$pr" --title "$TITLE" --body "$body"
+          else
+            gh pr create --base main --head "$BRANCH" --title "$TITLE" --body "$body"
+          fi
+          gh workflow run docker-build.yml --ref "$BRANCH"
